@@ -69,6 +69,7 @@ const executeAsyncFnsSerially = fns =>
 // used for lookups
 const DND_DROPPABLE_DATA_ATTR = '[data-rbd-droppable-id]';
 export const DND_DRAGGABLE_DATA_ATTR = '[data-rbd-draggable-id]';
+export const DND_DRAGGABLE_HANDLE_DATA_ATTR = '[data-rbd-drag-handle-draggable-id]';
 
 export const mockDndElSpacing = rtlUtils => {
   const droppables = rtlUtils.container.querySelectorAll(
@@ -113,12 +114,17 @@ export const makeDnd = async ({
         throw new Error('Unhandled `direction`!');
     }
   };
+
+  const getDragHandleEl = () => {
+    return getDragEl().querySelector(DND_DRAGGABLE_HANDLE_DATA_ATTR);
+  };
+
   const handleMovementInDirection = async () => {
     // enable keyboard dragging
-    fireEvent.keyDown(getDragEl(), spaceKey);
+    fireEvent.keyDown(getDragHandleEl(), spaceKey);
     await waitFor(() => getByText(/You have lifted an item/i));
     // move drag element based on direction
-    fireEvent.keyDown(getDragEl(), getKeyForDirection());
+    fireEvent.keyDown(getDragHandleEl(), getKeyForDirection());
     await waitFor(() => getByText(/You have moved the item/i));
     // disable keyboard dragging
     fireEvent.keyDown(getDragEl(), spaceKey);
@@ -126,8 +132,8 @@ export const makeDnd = async ({
   };
 
   // focus drag element
-  getDragEl().focus();
-  expect(getDragEl()).toHaveFocus();
+  getDragHandleEl().focus();
+  expect(getDragHandleEl()).toHaveFocus();
 
   // move drag element based on direction and positions
   const movements = [];
